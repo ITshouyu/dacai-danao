@@ -71,6 +71,8 @@ header{display:flex;align-items:center;gap:10px;padding:8px 0 4px}
 .tab{flex:1;min-height:44px;border:0;border-radius:10px;background:transparent;font-size:14px;font-weight:600;color:var(--gray);cursor:pointer;font-family:inherit}
 .tab.on{background:var(--green);color:#fff}
 .summary{margin-bottom:12px;font-size:13px;color:var(--gray)}
+.reason{display:none;background:var(--green);color:#fff;border-radius:var(--radius);padding:12px 14px;margin-bottom:12px;font-size:13px;line-height:1.7}
+.reason b{color:#fff}
 .dish{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:10px}
 .dish-head{display:flex;gap:12px;align-items:flex-start;cursor:pointer}
 .dish .idx{width:30px;flex:none;height:30px;border-radius:9px;background:var(--green-soft);color:var(--green);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
@@ -178,6 +180,7 @@ footer{margin-top:26px;text-align:center;font-size:11.5px;color:var(--gray)}
     <button class="tab" data-tab="buy">采购清单</button>
   </div>
   <div class="summary" id="summaryText"></div>
+  <div class="reason" id="reasonText"></div>
   <div id="viewDishes"></div>
   <div id="viewTimeline" style="display:none"></div>
   <div id="viewBuy" style="display:none"></div>
@@ -205,67 +208,67 @@ footer{margin-top:26px;text-align:center;font-size:11.5px;color:var(--gray)}
 /* ings: n名称 q每人份量 u单位 g分组(meat肉禽水产/veg蔬菜/grain主食豆谷/soup汤料/cond调料) */
 const DB = [
   {name:"奶香五红汤", cat:"糖水", meat:"素", method:"煮", flavor:"奶香甜糯", spicy:0, cost:4, diff:"低", memo:"健身补气血、不上火，当甜品喝",
-   prep:"黑米、糯米、红豆、花生提前泡 1–2 小时（不泡多煮 20 分钟）",
+   prepMin:5, cookMin:50, pot:"锅1", prep:"黑米、糯米、红豆、花生提前泡 1–2 小时（不泡多煮 20 分钟）",
    steps:["泡好的米豆 + 去核红枣 + 700ml 水，小火煮 50 分钟至黑米开花、糯米粘稠（偶尔搅底防粘锅）","放黄冰糖调味，尝甜度宁少勿多","关火前 3 分钟放枸杞","关火晾到 60℃ 温热，倒 200ml 全脂牛奶搅匀"],
    key:"红枣必须去核；糯米粘锅，最后 10 分钟多搅；牛奶关火后再加，不煮沸",
    ings:[{n:"黑米",q:20,u:"g",g:"grain"},{n:"糯米",q:15,u:"g",g:"grain"},{n:"红豆",q:20,u:"g",g:"grain"},{n:"红皮花生",q:20,u:"g",g:"grain"},{n:"红枣",q:2,u:"颗",g:"soup"},{n:"枸杞",q:10,u:"粒",g:"soup"},{n:"黄冰糖",q:8,u:"g",g:"cond"},{n:"全脂牛奶",q:200,u:"ml",g:"grain"}]},
   {name:"红糖鸡蛋姜汤", cat:"糖水", meat:"半荤", method:"煮", flavor:"甜姜暖", spicy:0, cost:3, diff:"低", memo:"经期暖身、受凉熬夜后喝",
-   prep:"老姜带皮切 3mm 厚片（带皮是不上火的关键）",
+   prepMin:2, cookMin:12, pot:"锅1", prep:"老姜带皮切 3mm 厚片（带皮是不上火的关键）",
    steps:["姜片 + 300ml 清水，小火煮 10 分钟出姜味","关火，鸡蛋整个打入（不搅散，做卧蛋）","蛋八分熟（蛋白凝固蛋黄软）放红糖搅化","再煮 1 分钟连汤带蛋出锅"],
    key:"红糖最后放不发苦；姜用老姜带皮，切厚片不切丝；晚上 9 点后别喝",
    ings:[{n:"老姜",q:15,u:"g",g:"cond"},{n:"红糖",q:15,u:"g",g:"cond"},{n:"鸡蛋",q:2,u:"个",g:"meat"},{n:"红枣",q:3,u:"颗",g:"soup"}]},
   {name:"马蹄竹蔗茅根猪颈肉汤", cat:"汤", meat:"荤", method:"煲", flavor:"清甜回甘", spicy:0, cost:10, diff:"低", memo:"降火润燥、一汤两用",
-   prep:"猪颈肉冷水下锅焯水；竹蔗破成条（不破不出味）",
+   prepMin:8, cookMin:90, pot:"锅1", prep:"猪颈肉冷水下锅焯水；竹蔗破成条（不破不出味）",
    steps:["猪颈肉冷水下锅焯水，冲净沥干","竹蔗破条、马蹄对半切、胡萝卜切块","全部下锅加足量水，大火煮开转小火煲 1–1.5 小时","基本不放盐，竹蔗自甜；肉捞出切块蘸豉油/沙姜，一汤两用"],
    key:"竹蔗选青皮甘蔗；猪颈肉先焯水去腥；放凉冰镇或热饮都行",
    ings:[{n:"猪颈肉",q:100,u:"g",g:"meat"},{n:"青皮竹蔗",q:0.5,u:"节",g:"soup"},{n:"马蹄",q:2,u:"个",g:"veg"},{n:"茅根",q:1,u:"小把",g:"soup"},{n:"胡萝卜",q:0.3,u:"根",g:"veg"},{n:"生姜",q:1,u:"片",g:"cond"}]},
   {name:"清蒸鲈鱼", cat:"主菜", meat:"荤", method:"蒸", flavor:"清鲜嫩", spicy:0, cost:15, diff:"中", memo:"高蛋白低脂、摆盘好看", tags:["健身","聚餐"],
-   prep:"葱姜盐搓出汁兑水泡鱼 5–10 分钟去腥",
+   prepMin:10, cookMin:7, pot:"蒸层", prep:"葱姜盐搓出汁兑水泡鱼 5–10 分钟去腥",
    steps:["鱼处理干净两面划刀，背部肉厚处再划一刀","泡好的鱼装盘：盘底垫姜片、鱼身摆姜片，撒一点盐","水大开上汽后再放鱼，大火 5 分钟，关火焖 2 分钟","出锅立刻倒掉盘底水（腥源，最关键一步）","挑掉姜片铺葱丝，浇一勺烧到冒烟的热油，豉油沿锅边倒"],
    key:"水开上汽才计时；盘底水必倒；豉油沿锅边别淋鱼背；鱼眼凸出、筷子戳背肉轻松进即熟",
    ings:[{n:"鲈鱼",q:200,u:"g",g:"meat"},{n:"生姜",q:1,u:"块",g:"cond"},{n:"小葱",q:3,u:"根",g:"veg"},{n:"蒸鱼豉油",q:2,u:"勺",g:"cond"},{n:"油",q:1,u:"勺",g:"cond"}]},
   {name:"胡萝卜丝炒牛肉丝", cat:"主菜", meat:"荤", method:"炒", flavor:"咸鲜", spicy:0, cost:12, diff:"中", memo:"高蛋白、分开炒再合", tags:["健身","下饭"],
-   prep:"牛肉丝加生抽料酒淀粉抓匀，淋半勺油锁水，腌 5 分钟",
+   prepMin:8, cookMin:5, pot:"锅2", prep:"牛肉丝加生抽料酒淀粉抓匀，淋半勺油锁水，腌 5 分钟",
    steps:["热锅大火，油热下牛肉快炒 30–40 秒至变色，立刻盛出","锅补油，胡萝卜丝中火炒 2–3 分钟到软出甜味","下蒜末、小米辣炒香","牛肉回锅，加盐、半勺生抽大火翻匀，薄薄勾芡出锅"],
    key:"牛肉胡萝卜分开炒再合，一起下锅牛肉必老；牛肉 40 秒是极限；淀粉上浆是嫩的关键；不打水牛肉不用洗",
    ings:[{n:"黄牛肉丝",q:75,u:"g",g:"meat"},{n:"胡萝卜",q:0.5,u:"根",g:"veg"},{n:"大蒜",q:3,u:"瓣",g:"cond"},{n:"小米辣",q:1,u:"个",g:"veg"},{n:"生抽",q:1,u:"勺",g:"cond"},{n:"料酒",q:1,u:"勺",g:"cond"},{n:"玉米淀粉",q:1,u:"小勺",g:"cond"}]},
   {name:"蒜蓉炒芦笋", cat:"主菜", meat:"素", method:"炒", flavor:"清蒜香脆", spicy:0, cost:8, diff:"低", memo:"控卡高纤、快手", tags:["健身","快手","一人食"],
-   prep:"芦笋手捏根部往上掰，折断处是老嫩分界；粗的削皮斜切段",
+   prepMin:5, cookMin:4, pot:"锅2", prep:"芦笋手捏根部往上掰，折断处是老嫩分界；粗的削皮斜切段",
    steps:["水开加 1 勺盐几滴油，芦笋焯 60–90 秒断生捞出","立刻过凉水锁脆锁绿，沥干","热锅冷油小火下蒜末小米辣，炒到蒜微黄出香","转大火下芦笋翻炒 20–30 秒，加生抽蚝油少许糖","淋薄水淀粉，汁挂上就出锅"],
    key:"焯水加油加盐是保绿关键；蒜全程小火防苦；下锅后大火不超 1 分钟；水淀粉薄薄一层",
    ings:[{n:"芦笋",q:200,u:"g",g:"veg"},{n:"大蒜",q:4,u:"瓣",g:"cond"},{n:"小米辣",q:1,u:"个",g:"veg"},{n:"生抽",q:1,u:"勺",g:"cond"},{n:"蚝油",q:1,u:"勺",g:"cond"},{n:"玉米淀粉",q:1,u:"小勺",g:"cond"}]},
   {name:"蒜蓉粉丝蒸大虾", cat:"主菜", meat:"荤", method:"蒸", flavor:"蒜香鲜", spicy:0, cost:20, diff:"中", memo:"满盘金黄、撑场面", tags:["聚餐"],
-   prep:"粉丝冷水泡 15 分钟剪段；虾开背去虾线留虾尾；蒜末一半冲水（防糊）",
+   prepMin:15, cookMin:10, pot:"蒸层", prep:"粉丝冷水泡 15 分钟剪段；虾开背去虾线留虾尾；蒜末一半冲水（防糊）",
    steps:["金银蒜：一半洗过的蒜末小火炒黄，加生抽蚝油黄酒糖调味，关火前拌入另一半生蒜，盛出一半备用","虾头小火煎出红油捞出","虾下锅煎到变红卷曲（1–2 分钟即停）","粉丝入锅加生抽老抽和 100–150ml 水","蒜蓉酱铺面，扣盖中小火 3–5 分钟收到基本干","撒大量葱花，关火焖 10 秒"],
    key:"粉丝只看配料表要绿豆粉；炒蒜全程小火；虾变色就停；收汁要干香留汤就废；蒜蓉酱多做冷藏可复用",
    ings:[{n:"基围虾",q:200,u:"g",g:"meat"},{n:"龙口粉丝",q:25,u:"g",g:"grain"},{n:"大蒜",q:0.75,u:"头",g:"cond"},{n:"线椒",q:1,u:"根",g:"veg"},{n:"小葱",q:3,u:"根",g:"veg"},{n:"生抽",q:2,u:"勺",g:"cond"},{n:"蚝油",q:1,u:"勺",g:"cond"},{n:"黄酒",q:1,u:"勺",g:"cond"},{n:"老抽",q:1,u:"滴",g:"cond"},{n:"白糖",q:0.5,u:"勺",g:"cond"}]},
   {name:"豆豉蒸排骨", cat:"主菜", meat:"荤", method:"蒸", flavor:"豉香咸鲜", spicy:0, cost:10, diff:"低", memo:"豉汁香、嫩到脱骨、汁拌饭", tags:["下饭","快手"],
-   prep:"排骨加淀粉和盐抓洗到水清，吸干水分（决定入味）；腌 10 分钟",
+   prepMin:15, cookMin:20, pot:"蒸层", prep:"排骨加淀粉和盐抓洗到水清，吸干水分（决定入味）；腌 10 分钟",
    steps:["蒜末姜末豆豉碎装碗，浇 2 勺烧到冒烟的热油激香，加生抽蚝油老抽糖淀粉拌匀成豉汁","豉汁倒进排骨抓匀腌 10 分钟，喜辣撒辣椒粉","浅盘单层平铺，不堆叠","水开后上锅，中火蒸 20 分钟（块小 15 分钟够）","出锅撒葱花，连汁上桌拌饭"],
    key:"淀粉抓洗比泡水快；热油泼豆豉比直接拌香得多；糖是压豆豉咸的关键；盐减半",
    ings:[{n:"猪纯肋排粒",q:150,u:"g",g:"meat"},{n:"豆豉",q:8,u:"g",g:"cond"},{n:"大蒜",q:4,u:"瓣",g:"cond"},{n:"生姜",q:3,u:"片",g:"cond"},{n:"小葱",q:2,u:"根",g:"veg"},{n:"生抽",q:1,u:"勺",g:"cond"},{n:"蚝油",q:1,u:"勺",g:"cond"},{n:"老抽",q:0.5,u:"勺",g:"cond"},{n:"白糖",q:1,u:"勺",g:"cond"},{n:"玉米淀粉",q:3,u:"勺",g:"cond"}]},
   {name:"避风塘炒大虾", cat:"主菜", meat:"荤", method:"炸炒", flavor:"蒜酥香辣", spicy:2, cost:20, diff:"高", memo:"金黄酥脆、显手艺（调料包简化版）", tags:["聚餐"],
-   prep:"虾开背去虾线，洗净彻底沥干，拍薄薄一层干淀粉",
+   prepMin:15, cookMin:8, pot:"锅1", prep:"虾开背去虾线，洗净彻底沥干，拍薄薄一层干淀粉",
    steps:["油烧到六成热，虾下锅煎到外壳金黄酥脆，盛出","锅留底油，倒避风塘炒料，小火炒香（别炒糊）","虾回锅，加干辣椒、葱花，大火翻匀让蒜酥裹满虾","出锅"],
    key:"虾要沥干+拍粉才脆；炒料本身够咸全程不放盐；炒料必须小火，蒜酥一糊发苦；虾壳脆就停，久煎肉柴",
    ings:[{n:"大虾",q:150,u:"g",g:"meat"},{n:"避风塘炒料",q:0.25,u:"包",g:"cond"},{n:"干辣椒",q:2,u:"个",g:"veg"},{n:"小葱",q:2,u:"根",g:"veg"},{n:"玉米淀粉",q:1,u:"勺",g:"cond"}]},
   {name:"香煎鸡腿排", cat:"主菜", meat:"荤", method:"煎", flavor:"焦香嫩", spicy:0, cost:8, diff:"低", memo:"高蛋白、无油皮朝下煎", tags:["健身","快手","一人食"],
-   prep:"提前冷藏解冻；刀背拍松，肉面划两刀防收缩；腌 15–20 分钟",
+   prepMin:15, cookMin:10, pot:"锅2", prep:"提前冷藏解冻；刀背拍松，肉面划两刀防收缩；腌 15–20 分钟",
    steps:["蒜末、黑胡椒、生抽抓匀（加 1 勺淀粉外层更脆），腌 15–20 分钟","平底锅皮朝下、中小火，不用加油——鸡皮自己出油","逼到鸡皮金黄焦脆再翻面，另一面也煎金黄，全程约 7–10 分钟","筷子戳最厚处，流出的汁水透明无血水即熟","出锅静置 3 分钟再切（肉汁不流失），配沙拉酱减半或油醋汁"],
    key:"皮朝下先煎自己出油；验熟看汁水透明别切开；静置再切；沙拉酱减脂就减半或换油醋",
    ings:[{n:"冷鲜鸡腿排",q:180,u:"g",g:"meat"},{n:"大蒜",q:3,u:"瓣",g:"cond"},{n:"黑胡椒",q:1,u:"撮",g:"cond"},{n:"生抽",q:1,u:"勺",g:"cond"},{n:"玉米淀粉",q:1,u:"勺",g:"cond"},{n:"蔬菜沙拉",q:90,u:"g",g:"veg"}]},
   {name:"三杯鸡", cat:"主菜", meat:"荤", method:"焖", flavor:"甜咸香", spicy:1, cost:12, diff:"中", memo:"江西家乡味、油亮像餐厅", tags:["聚餐","下饭"],
-   prep:"鸡斩块，冷水下锅焯水，冲净沥干",
+   prepMin:10, cookMin:20, pot:"锅1", prep:"鸡斩块，冷水下锅焯水，冲净沥干",
    steps:["锅下香油（这道用香油起锅是香味的根），姜片蒜瓣小火爆香","下鸡块，中火煸到表面微黄","倒米酒、生抽、老抽、糖、干辣椒，翻炒上色","小火盖盖焖 15 分钟","开盖大火收汁，收到油亮起泡，最后再淋半勺香油出锅"],
    key:"香油起锅+收汁再淋香油；米酒别用料酒替代；焖够 15 分钟才入味不柴；留一点汁拌饭",
    ings:[{n:"鸡腿/半只鸡",q:175,u:"g",g:"meat"},{n:"米酒",q:80,u:"ml",g:"cond"},{n:"生抽",q:3,u:"勺",g:"cond"},{n:"老抽",q:1,u:"勺",g:"cond"},{n:"香油",q:50,u:"ml",g:"cond"},{n:"白糖",q:1,u:"勺",g:"cond"},{n:"生姜",q:5,u:"片",g:"cond"},{n:"大蒜",q:6,u:"瓣",g:"cond"},{n:"干辣椒",q:3,u:"个",g:"veg"}]},
   {name:"番茄炖牛肋条", cat:"主菜", meat:"荤", method:"炖", flavor:"酸甜软烂", spicy:0, cost:18, diff:"中", memo:"出品像西餐厅、提前炖、汤汁拌饭", tags:["聚餐"],
-   prep:"牛肋条切块冷水焯水；番茄开水烫一下去皮切块",
+   prepMin:15, cookMin:90, pot:"锅1", prep:"牛肋条切块冷水焯水；番茄开水烫一下去皮切块",
    steps:["姜蒜爆香，下番茄炒到出沙","下牛肋条，加番茄酱、生抽、糖炒匀，加水没过","小火炖 1–1.5 小时至软烂","最后加盐、开盖收汁（别收太干，留汁拌饭）"],
    key:"牛肋条选带筋膜肥瘦相间的炖久不柴；番茄先炒出沙汤汁才浓；可提前炖好保温，上桌前收汁",
    ings:[{n:"牛肋条",q:150,u:"g",g:"meat"},{n:"番茄",q:1,u:"个",g:"veg"},{n:"番茄酱",q:2,u:"勺",g:"cond"},{n:"生抽",q:2,u:"勺",g:"cond"},{n:"白糖",q:1,u:"勺",g:"cond"},{n:"生姜",q:3,u:"片",g:"cond"},{n:"大蒜",q:3,u:"瓣",g:"cond"}]},
   {name:"擂辣椒皮蛋", cat:"凉菜", meat:"半荤", method:"凉拌", flavor:"酸辣香", spicy:2, cost:6, diff:"低", memo:"擂钵上桌、仪式感是这道菜的一半",
-   prep:"干锅烧热不放油，辣椒整根放进去压着煎到两面焦黑起虎皮，撕去焦皮",
+   prepMin:8, cookMin:5, pot:"锅2", prep:"干锅烧热不放油，辣椒整根放进去压着煎到两面焦黑起虎皮，撕去焦皮",
    steps:["皮蛋剥壳切块","蒜末+生抽+香醋+糖+香油先擂出香味","加煎好的辣椒擂碎","最后放皮蛋再轻擂几下，留点块状口感，连擂钵端上桌"],
    key:"辣椒干锅煎出虎皮才香；辣度靠辣椒品种，怕辣换菜椒；皮蛋最后放擂成碎中带块",
    ings:[{n:"皮蛋",q:1,u:"个",g:"meat"},{n:"螺丝椒",q:1,u:"根",g:"veg"},{n:"大蒜",q:4,u:"瓣",g:"cond"},{n:"生抽",q:2,u:"勺",g:"cond"},{n:"香醋",q:1,u:"勺",g:"cond"},{n:"香油",q:1,u:"勺",g:"cond"},{n:"白糖",q:0.5,u:"勺",g:"cond"}]}
@@ -336,11 +339,18 @@ function pickMeal(){
     pool.sort((a,b)=>a.cost-b.cost);
   }
   while(res.length<need && pool.length){
-    let pick=pool.find(d=>fit(d) && !usedMethods[d.method] && per>=d.cost);
-    if(!pick) pick=pool.find(d=>fit(d) && per>=d.cost);
-    if(!pick) pick=pool.find(d=>fit(d) && !usedMethods[d.method]);
-    if(!pick) pick=pool[0];
-    pool=pool.filter(d=>d!==pick);
+    const meatCount=res.filter(function(r){return r.meat!=="素"}).length;
+    const vegPool=pool.filter(function(d){return d.meat==="素" && fit(d)});
+    let pick=null;
+    if(meatCount>=3 && vegPool.length){
+      pick=vegPool.slice().sort(function(a,b){return a.cost-b.cost})[0];
+    } else {
+      pick=pool.find(function(d){return fit(d) && !usedMethods[d.method] && per>=d.cost});
+      if(!pick) pick=pool.find(function(d){return fit(d) && per>=d.cost});
+      if(!pick) pick=pool.find(function(d){return fit(d) && !usedMethods[d.method]});
+      if(!pick) pick=pool[0];
+    }
+    pool=pool.filter(function(d){return d!==pick});
     if(res.includes(pick)) continue;
     res.push(pick);
     usedMethods[pick.method]=1;
@@ -349,13 +359,34 @@ function pickMeal(){
 }
 
 const ORDER={"凉拌":0,"煲":1,"炖":1,"煮":2,"焖":3,"蒸":4,"煎":5,"炒":6,"炸炒":7};
-const PARALLEL={"蒸":"可同时炒/煎另一锅","炖":"慢火不占人，可同时备菜","煲":"慢火不占人，可同时备菜","焖":"可同时炒/蒸另一锅","煮":"可同时炒/煎另一锅","煎":"适合配蒸菜同步","炒":"最后再做，锅热菜好","炸炒":"最后再做，锅热菜好"};
-function timeline(dishes){
-  const arr=dishes.slice().sort((a,b)=>ORDER[a.method]-ORDER[b.method]);
-  return arr.map(function(d,i){
-    const label=i===0?"先做":(i===arr.length-1?"最后做":"第"+(i+1)+"步");
-    return {label:label, d:d};
-  });
+const PARALLEL={"蒸":"叠在任意锅上，不占灶位，可同时做别的","炖":"慢火不占人，可同时备菜","煲":"慢火不占人，可同时备菜","焖":"可同时炒/蒸另一锅","煮":"可同时炒/煎另一锅","煎":"适合配蒸菜同步","炒":"最后再做，锅热菜好","炸炒":"最后再做，锅热菜好","凉拌":"免锅，开火前就能拌好"};
+
+/* ================= 搭配理由 ================= */
+function mealReason(dishes){
+  const meatin=dishes.filter(function(d){return d.meat!=="素"}).length;
+  const methods=dishes.map(function(d){return d.method});
+  const spicy=dishes.filter(function(d){return d.spicy>0}).length;
+  const sceneHint=state.scene==="聚餐"?"撑场面+下饭":(state.scene==="健身"?"高蛋白控卡":(state.scene==="一人食"?"快手低成本":"家常均衡"));
+  let s="<b>为什么这样搭 · "+sceneHint+"</b>：";
+  s+=dishes.length+" 道 = "+meatin+" 荤 + "+(dishes.length-meatin)+" 素；";
+  s+="手法 "+methods.join("/")+" 错开，不和灶台抢时间；";
+  if(spicy>0){s+=""+spicy+" 道带辣做记忆点，"+(dishes.length-spicy)+" 道清甜回甘收尾";}
+  else{s+="整桌不辣，想吃辣靠蘸碟/干椒现加，降火不破味";}
+  return s;
+}
+
+function timelineHTML(dishes){
+  const preTotal=Math.max.apply(null,dishes.map(function(d){return d.prepMin||5}));
+  const preps=dishes.map(function(d){
+    return '<div class="tl"><div class="t">'+d.name+' · 备菜 '+d.prepMin+'min</div><p>'+d.prep+'</p></div>';
+  }).join("");
+  const cooks=dishes.slice().sort(function(a,b){return ORDER[a.method]-ORDER[b.method]}).map(function(d){
+    const potTxt=d.pot==="免锅"?"免锅":(d.pot==="蒸层"?"蒸层（叠在锅上，不占灶）":d.pot);
+    const long=(d.method==="炖"||d.method==="煲")?'<span style="color:var(--orange);font-weight:600">建议提前炖好保温，上桌前收汁</span>':'';
+    return '<div class="tl"><div class="t">'+d.name+' · '+d.method+' '+d.cookMin+'min · '+potTxt+'</div><p>'+PARALLEL[d.method]+'</p>'+long+'</div>';
+  }).join("");
+  return '<div class="tl" style="border:1.5px solid var(--orange)"><div class="t">开火前 · 备菜（约 '+preTotal+' 分钟，全部并行）</div><p>先做这些，再开火：</p></div>'+preps
+    +'<div class="tl" style="border:1.5px solid var(--orange);margin-top:4px"><div class="t">开火后 · 锅位安排</div><p>锅1 + 锅2 可同时开工，蒸层叠在任意锅上：</p></div>'+cooks;
 }
 
 /* ================= 采购清单（合并去重 · 按人数算量） ================= */
@@ -426,16 +457,14 @@ function render(){
   document.getElementById("empty").style.display="none";
   document.getElementById("summaryText").textContent=
     state.people+"人 · "+state.scene+" · "+state.taste+" · 预算"+state.budget+"元 → 推荐"+dishes.length+"道 · 约"+total+"元";
+  const rt=document.getElementById("reasonText");
+  rt.innerHTML=mealReason(dishes);
+  rt.style.display="block";
   document.getElementById("viewDishes").innerHTML=dishes.map(dishCard).join("");
   document.getElementById("viewDishes").querySelectorAll(".dish-head").forEach(function(h,idx){
     h.onclick=function(){h.parentElement.classList.toggle("open")};
   });
-  const vt=document.getElementById("viewTimeline");
-  vt.innerHTML=dishes.slice().sort((a,b)=>ORDER[a.method]-ORDER[b.method]).map(function(d,i){
-    const label=i===0?"先做":(i===dishes.length-1?"最后做":"第"+(i+1)+"步");
-    return '<div class="tl"><div class="t">'+label+'</div><h4>'+d.name+'</h4>'
-      +'<p>'+d.method+' · '+d.prep+'</p><p style="color:var(--orange);font-weight:600;margin-top:4px">'+PARALLEL[d.method]+'</p></div>';
-  }).join("");
+  document.getElementById("viewTimeline").innerHTML=timelineHTML(dishes);
   const vb=document.getElementById("viewBuy");
   const groups=mergedShopping(dishes);
   let html="";
