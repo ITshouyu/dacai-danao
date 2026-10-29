@@ -64,6 +64,20 @@ header{display:flex;align-items:center;gap:10px;padding:8px 0 4px}
 }
 .btn2.primary{background:var(--green);border-color:var(--green);color:#fff}
 .btn2:active{transform:translateY(1px)}
+.btn2:disabled{opacity:.4;cursor:not-allowed}
+
+/* ===== 自选菜 ===== */
+.search{width:100%;min-height:44px;border:1.5px solid var(--line);border-radius:12px;padding:10px 14px;font-size:16px;font-family:inherit;background:#fff;margin-bottom:10px}
+.search:focus{outline:none;border-color:var(--green)}
+.pick-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;max-height:264px;overflow:auto}
+.pick{
+  min-height:56px;padding:8px 10px;border-radius:12px;border:1.5px solid var(--line);
+  background:#fff;font-size:13.5px;color:var(--ink);cursor:pointer;text-align:left;font-family:inherit;line-height:1.3;
+}
+.pick span{display:block;font-size:11px;color:var(--gray);margin-top:2px}
+.pick.on{background:var(--green);border-color:var(--green);color:#fff}
+.pick.on span{color:rgba(255,255,255,.8)}
+.picked{font-size:13px;color:var(--gray);margin-bottom:10px}
 
 /* ===== Output ===== */
 #out{margin-top:18px;display:none}
@@ -173,6 +187,16 @@ footer{margin-top:26px;text-align:center;font-size:11.5px;color:var(--gray)}
 </section>
 </div>
 
+<section class="panel" id="pickPanel">
+  <div class="field">
+    <span class="f-label">或者，自己点几道菜（可选）</span>
+    <input class="search" id="searchBox" placeholder="搜菜名，如：鲈鱼 / 虾 / 排骨" autocomplete="off">
+    <div class="pick-grid" id="pickGrid"></div>
+    <div class="picked" id="pickedText">还没选。点上面的菜加入这桌。</div>
+    <button class="btn2 primary" id="pickGoBtn" disabled>按我的选择出方案</button>
+  </div>
+</section>
+
 <div id="out">
   <div class="tabs">
     <button class="tab on" data-tab="dishes">一桌菜</button>
@@ -186,9 +210,9 @@ footer{margin-top:26px;text-align:center;font-size:11.5px;color:var(--gray)}
   <div id="viewBuy" style="display:none"></div>
 </div>
 
-<div class="empty" id="empty">还没生成。选好人数和口味，点「生成一桌菜」。<br>v0.3 · 数据库 13 道菜 · 带做法详情</div>
+<div class="empty" id="empty">还没生成。选好人数和口味，点「生成一桌菜」；或往下划自己点几道菜。<br>v0.5 · 数据库 13 道菜 · 带做法详情</div>
 
-<footer>搭菜大脑 v0.3 · 本机已规划 <span id="genCount" style="color:var(--orange);font-weight:700">0</span> 桌<br>全网访问 <span id="busuanzi_value_site_pv">-</span> · 访客 <span id="busuanzi_value_site_uv">-</span> · 2026-10-29</footer>
+<footer>搭菜大脑 v0.5 · 本机已规划 <span id="genCount" style="color:var(--orange);font-weight:700">0</span> 桌<br>全网访问 <span id="busuanzi_value_site_pv">-</span> · 访客 <span id="busuanzi_value_site_uv">-</span> · 2026-10-29</footer>
 </div>
 
 <div class="modal" id="payModal">
@@ -276,7 +300,7 @@ const DB = [
 ];
 
 /* ================= 状态 ================= */
-const state = {people:4, scene:"聚餐", taste:"能吃辣", avoid:"无", budget:150};
+const state = {people:4, scene:"聚餐", taste:"能吃辣", avoid:"无", budget:150, selected:[]};
 let unlocked = false;
 const PEOPLE=[1,2,3,4,5], SCENES=[["聚餐","日常","健身","一人食"]];
 const TASTE=[["能吃辣","清淡","都行"]], AVOID=[["无","长痘控辣","降火"]];
@@ -362,11 +386,11 @@ const ORDER={"凉拌":0,"煲":1,"炖":1,"煮":2,"焖":3,"蒸":4,"煎":5,"炒":6,
 const PARALLEL={"蒸":"叠在任意锅上，不占灶位，可同时做别的","炖":"慢火不占人，可同时备菜","煲":"慢火不占人，可同时备菜","焖":"可同时炒/蒸另一锅","煮":"可同时炒/煎另一锅","煎":"适合配蒸菜同步","炒":"最后再做，锅热菜好","炸炒":"最后再做，锅热菜好","凉拌":"免锅，开火前就能拌好"};
 
 /* ================= 搭配理由 ================= */
-function mealReason(dishes){
+function mealReason(dishes, mode){
   const meatin=dishes.filter(function(d){return d.meat!=="素"}).length;
   const methods=dishes.map(function(d){return d.method});
   const spicy=dishes.filter(function(d){return d.spicy>0}).length;
-  const sceneHint=state.scene==="聚餐"?"撑场面+下饭":(state.scene==="健身"?"高蛋白控卡":(state.scene==="一人食"?"快手低成本":"家常均衡"));
+  const sceneHint=mode==="pick"?"你的选择":(state.scene==="聚餐"?"撑场面+下饭":(state.scene==="健身"?"高蛋白控卡":(state.scene==="一人食"?"快手低成本":"家常均衡")));
   let s="<b>为什么这样搭 · "+sceneHint+"</b>：";
   s+=dishes.length+" 道 = "+meatin+" 荤 + "+(dishes.length-meatin)+" 素；";
   s+="手法 "+methods.join("/")+" 错开，不和灶台抢时间；";
@@ -450,15 +474,14 @@ function dishCard(d,i){
     +'<div class="sd">做法</div>'+detail
     +'</div></div>';
 }
-function render(){
-  const dishes=pickMeal();
+function renderPlan(dishes, mode){
   const total=shoppingTotal(dishes);
   document.getElementById("out").style.display="block";
   document.getElementById("empty").style.display="none";
   document.getElementById("summaryText").textContent=
-    state.people+"人 · "+state.scene+" · "+state.taste+" · 预算"+state.budget+"元 → 推荐"+dishes.length+"道 · 约"+total+"元";
+    (mode==="pick"?"自选 · ":"")+state.people+"人 · "+state.scene+" · "+state.taste+" · 预算"+state.budget+"元 → "+dishes.length+"道 · 约"+total+"元";
   const rt=document.getElementById("reasonText");
-  rt.innerHTML=mealReason(dishes);
+  rt.innerHTML=mealReason(dishes, mode);
   rt.style.display="block";
   document.getElementById("viewDishes").innerHTML=dishes.map(dishCard).join("");
   document.getElementById("viewDishes").querySelectorAll(".dish-head").forEach(function(h,idx){
@@ -479,6 +502,42 @@ function render(){
   html+='<div class="total">合计约 <b>'+total+'</b> 元 · 人均 '+Math.round(total/state.people)+' 元（按人数自动换算份量）</div>';
   vb.innerHTML=html;
   bumpCount();
+}
+function render(){ renderPlan(pickMeal(), "auto"); }
+function renderSelected(){
+  if(!state.selected.length) return;
+  renderPlan(state.selected.slice(), "pick");
+  document.getElementById("out").scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+/* ================= 自选菜 ================= */
+function drawPickGrid(){
+  const q=document.getElementById("searchBox").value.trim();
+  const grid=document.getElementById("pickGrid");
+  grid.innerHTML="";
+  DB.forEach(function(d){
+    if(q && d.name.indexOf(q)<0) return;
+    const b=document.createElement("button");
+    b.type="button";
+    b.className="pick"+(state.selected.indexOf(d)>=0?" on":"");
+    b.innerHTML=d.name+'<span>'+d.cat+" · "+d.method+' · ¥'+d.cost+'/人</span>';
+    b.onclick=function(){
+      const i=state.selected.indexOf(d);
+      if(i>=0){state.selected.splice(i,1);}
+      else if(state.selected.length>=5){updatePicked("最多选 5 道");return;}
+      else{state.selected.push(d);}
+      drawPickGrid(); updatePicked();
+    };
+    grid.appendChild(b);
+  });
+}
+function updatePicked(msg){
+  const t=document.getElementById("pickedText");
+  if(msg){t.textContent=msg;return;}
+  t.textContent=state.selected.length
+    ? "已选 "+state.selected.length+" 道："+state.selected.map(function(d){return d.name}).join("、")
+    : "还没选。点上面的菜加入这桌。";
+  document.getElementById("pickGoBtn").disabled=!state.selected.length;
 }
 
 /* ================= 事件 ================= */
@@ -522,6 +581,10 @@ document.querySelectorAll(".tab").forEach(function(tb){
     document.getElementById("viewBuy").style.display=k==="buy"?"block":"none";
   };
 });
+document.getElementById("searchBox").oninput=function(){drawPickGrid()};
+document.getElementById("pickGoBtn").onclick=function(){renderSelected()};
+drawPickGrid();
+updatePicked();
 </script>
 </body>
 </html>
