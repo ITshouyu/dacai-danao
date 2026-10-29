@@ -210,9 +210,9 @@ footer{margin-top:26px;text-align:center;font-size:11.5px;color:var(--gray)}
   <div id="viewBuy" style="display:none"></div>
 </div>
 
-<div class="empty" id="empty">还没生成。选好人数和口味，点「生成一桌菜」；或往下划自己点几道菜。<br>v0.5 · 数据库 13 道菜 · 带做法详情</div>
+<div class="empty" id="empty">还没生成。选好人数和口味，点「生成一桌菜」；或往下划自己点几道菜。<br>v0.6 · 数据库 <span id="dbCount">16</span> 道菜 · 带做法详情</div>
 
-<footer>搭菜大脑 v0.5 · 本机已规划 <span id="genCount" style="color:var(--orange);font-weight:700">0</span> 桌<br>全网访问 <span id="busuanzi_value_site_pv">-</span> · 访客 <span id="busuanzi_value_site_uv">-</span> · 2026-10-29</footer>
+<footer>搭菜大脑 v0.6 · 菜谱 <span id="dbCount2" style="color:var(--orange);font-weight:700">16</span> 道 · 本机已规划 <span id="genCount" style="color:var(--orange);font-weight:700">0</span> 桌<br>全网访问 <span id="busuanzi_value_site_pv">-</span> · 访客 <span id="busuanzi_value_site_uv">-</span> · 2026-10-29</footer>
 </div>
 
 <div class="modal" id="payModal">
@@ -295,7 +295,22 @@ const DB = [
    prepMin:8, cookMin:5, pot:"锅2", prep:"干锅烧热不放油，辣椒整根放进去压着煎到两面焦黑起虎皮，撕去焦皮",
    steps:["皮蛋剥壳切块","蒜末+生抽+香醋+糖+香油先擂出香味","加煎好的辣椒擂碎","最后放皮蛋再轻擂几下，留点块状口感，连擂钵端上桌"],
    key:"辣椒干锅煎出虎皮才香；辣度靠辣椒品种，怕辣换菜椒；皮蛋最后放擂成碎中带块",
-   ings:[{n:"皮蛋",q:1,u:"个",g:"meat"},{n:"螺丝椒",q:1,u:"根",g:"veg"},{n:"大蒜",q:4,u:"瓣",g:"cond"},{n:"生抽",q:2,u:"勺",g:"cond"},{n:"香醋",q:1,u:"勺",g:"cond"},{n:"香油",q:1,u:"勺",g:"cond"},{n:"白糖",q:0.5,u:"勺",g:"cond"}]}
+   ings:[{n:"皮蛋",q:1,u:"个",g:"meat"},{n:"螺丝椒",q:1,u:"根",g:"veg"},{n:"大蒜",q:4,u:"瓣",g:"cond"},{n:"生抽",q:2,u:"勺",g:"cond"},{n:"香醋",q:1,u:"勺",g:"cond"},{n:"香油",q:1,u:"勺",g:"cond"},{n:"白糖",q:0.5,u:"勺",g:"cond"}]},
+  {name:"白灼基围虾", cat:"主菜", meat:"荤", method:"煮", flavor:"鲜甜弹", spicy:0, cost:12, diff:"低", memo:"高蛋白、蘸汁就鲜、宴客也拿得出手", tags:["健身","快手"],
+   prepMin:8, cookMin:4, pot:"锅1", prep:"虾剪须开背去虾线，冲净沥干",
+   steps:["锅里加姜片、葱结、1 勺料酒，烧到冒鱼眼泡就下虾","虾变红、虾身弓起（约 3–4 分钟）马上捞起，过一下冰水肉更弹","生抽 2 勺+香醋 1 勺+姜末蒜末小米辣圈+香油调蘸汁，蘸着吃"],
+   key:"水别大滚再下虾；虾弓起即熟，过冰水才弹；蘸汁是灵魂，姜蒜多一点",
+   ings:[{n:"基围虾",q:125,u:"g",g:"meat"},{n:"生姜",q:2,u:"片",g:"cond"},{n:"小葱",q:2,u:"根",g:"veg"},{n:"料酒",q:1,u:"勺",g:"cond"},{n:"生抽",q:2,u:"勺",g:"cond"},{n:"香醋",q:1,u:"勺",g:"cond"},{n:"大蒜",q:3,u:"瓣",g:"cond"},{n:"小米辣",q:1,u:"个",g:"veg"},{n:"香油",q:0.5,u:"勺",g:"cond"}]},
+  {name:"蒜蓉炒菜心", cat:"主菜", meat:"素", method:"炒", flavor:"蒜香清甜", spicy:0, cost:4, diff:"低", memo:"广式餐桌最日常的绿叶菜，2 分钟出锅", tags:["快手","一人食"],
+   prepMin:3, cookMin:3, pot:"锅2", prep:"菜心去老根老叶，粗的竖切两半；蒜拍碎",
+   steps:["锅热下油，蒜末爆香","下菜心大火快炒，加半勺盐和一点点白糖提鲜","炒到断生还带脆（约 1 分半），沿锅边淋小半勺生抽拌匀出锅"],
+   key:"必须大火快炒保持脆；盐+一点糖是广式青菜底味；别盖盖焖，会发黄出水",
+   ings:[{n:"菜心",q:150,u:"g",g:"veg"},{n:"大蒜",q:3,u:"瓣",g:"cond"},{n:"盐",q:1,u:"小勺",g:"cond"},{n:"白糖",q:0.5,u:"小勺",g:"cond"},{n:"生抽",q:0.5,u:"勺",g:"cond"}]},
+  {name:"番茄炒滑蛋", cat:"主菜", meat:"半荤", method:"炒", flavor:"酸甜滑嫩", spicy:0, cost:5, diff:"低", memo:"下饭之王、番茄炒出沙才好吃", tags:["快手","一人食","下饭"],
+   prepMin:5, cookMin:6, pot:"锅2", prep:"番茄划十字开水烫 30 秒去皮切块；鸡蛋加盐和几滴水打散",
+   steps:["热锅冷油，油温六成下蛋液，凝固就推成大片，7 成熟先盛出","补一点油，下番茄中火炒出沙（约 2 分钟，出汁才好吃）","倒回鸡蛋，加半勺糖、1 小勺盐、几滴香油，翻匀就出锅"],
+   key:"鸡蛋先盛出再炒番茄，才又滑又嫩；番茄一定炒出沙；糖是提鲜不是甜",
+   ings:[{n:"番茄",q:0.8,u:"个",g:"veg"},{n:"鸡蛋",q:1,u:"个",g:"meat"},{n:"盐",q:1,u:"小勺",g:"cond"},{n:"白糖",q:0.5,u:"小勺",g:"cond"},{n:"香油",q:2,u:"滴",g:"cond"}]}
   /* @@DB_PART2@@ */
 ];
 
@@ -367,7 +382,8 @@ function pickMeal(){
     const vegPool=pool.filter(function(d){return d.meat==="素" && fit(d)});
     let pick=null;
     if(meatCount>=3 && vegPool.length){
-      pick=vegPool.slice().sort(function(a,b){return a.cost-b.cost})[0];
+      const fresh=vegPool.filter(function(d){return !usedMethods[d.method]});
+      pick=(fresh.length?fresh:vegPool).slice().sort(function(a,b){return a.cost-b.cost})[0];
     } else {
       pick=pool.find(function(d){return fit(d) && !usedMethods[d.method] && per>=d.cost});
       if(!pick) pick=pool.find(function(d){return fit(d) && per>=d.cost});
@@ -515,8 +531,10 @@ function drawPickGrid(){
   const q=document.getElementById("searchBox").value.trim();
   const grid=document.getElementById("pickGrid");
   grid.innerHTML="";
+  let hit=0;
   DB.forEach(function(d){
     if(q && d.name.indexOf(q)<0) return;
+    hit++;
     const b=document.createElement("button");
     b.type="button";
     b.className="pick"+(state.selected.indexOf(d)>=0?" on":"");
@@ -530,6 +548,12 @@ function drawPickGrid(){
     };
     grid.appendChild(b);
   });
+  if(!hit){
+    const e=document.createElement("div");
+    e.style.cssText="grid-column:1/-1;text-align:center;color:var(--gray);font-size:12.5px;padding:14px 0;line-height:1.6";
+    e.textContent=q?("还没找到「"+q+"」——把菜谱图或链接发给阿鱼，24h 内入库"):"";
+    grid.appendChild(e);
+  }
 }
 function updatePicked(msg){
   const t=document.getElementById("pickedText");
@@ -583,6 +607,11 @@ document.querySelectorAll(".tab").forEach(function(tb){
 });
 document.getElementById("searchBox").oninput=function(){drawPickGrid()};
 document.getElementById("pickGoBtn").onclick=function(){renderSelected()};
+try{
+  const c=String(DB.length);
+  var a1=document.getElementById("dbCount"); if(a1) a1.textContent=c;
+  var a2=document.getElementById("dbCount2"); if(a2) a2.textContent=c;
+}catch(e){}
 drawPickGrid();
 updatePicked();
 </script>
