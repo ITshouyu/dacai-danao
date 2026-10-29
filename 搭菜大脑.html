@@ -178,7 +178,7 @@ footer{margin-top:26px;text-align:center;font-size:11.5px;color:var(--gray)}
 
 <div class="empty" id="empty">还没生成。选好人数和口味，点「生成一桌菜」。<br>v0.2 · 数据库 13 道菜 · 规则 v0.2</div>
 
-<footer>搭菜大脑 v0.2 · 已被生成 <span id="genCount" style="color:var(--orange);font-weight:700">-</span> 次<br>访问 <span id="busuanzi_value_site_pv">-</span> · 访客 <span id="busuanzi_value_site_uv">-</span> · 2026-10-29</footer>
+<footer>搭菜大脑 v0.2 · 本机已规划 <span id="genCount" style="color:var(--orange);font-weight:700">0</span> 桌<br>全网访问 <span id="busuanzi_value_site_pv">-</span> · 访客 <span id="busuanzi_value_site_uv">-</span> · 2026-10-29</footer>
 </div>
 
 <div class="modal" id="payModal">
@@ -296,13 +296,14 @@ function timeline(dishes){
   });
 }
 
-/* ================= 埋点 ================= */
-function hitCount(){
+/* ================= 本地计数（不冒充全网数据；全网指标看页脚不蒜子 PV/UV） ================= */
+function bumpCount(){
   try{
-    fetch("https://api.countapi.xyz/hit/dacai-danao-v02/generate").then(function(r){return r.json()}).then(function(j){
-      const el=document.getElementById("genCount");
-      if(el && j.value) el.textContent=j.value;
-    }).catch(function(){});
+    const k="dacai-danao-local-tables";
+    let n=parseInt(localStorage.getItem(k)||"0",10)+1;
+    localStorage.setItem(k,String(n));
+    const el=document.getElementById("genCount");
+    if(el) el.textContent=n;
   }catch(e){}
 }
 
@@ -355,7 +356,7 @@ function render(){
   const t=document.createElement("div");
   t.className="total"; t.innerHTML="合计约 <b>"+total+"</b> 元 · 人均 "+Math.round(total/state.people)+" 元";
   vb.appendChild(t);
-  hitCount();
+  bumpCount();
 }
 
 /* ================= 事件 ================= */
