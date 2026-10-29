@@ -30,6 +30,7 @@ body{
 header{display:flex;align-items:center;gap:10px;padding:8px 0 4px}
 .logo{width:34px;height:34px;border-radius:10px;background:var(--green);display:flex;align-items:center;justify-content:center;flex:none}
 .logo svg{width:20px;height:20px}
+.brand{flex:1}
 .brand strong{font-size:19px;letter-spacing:.02em}
 .brand span{display:block;font-size:12px;color:var(--gray)}
 .hero{margin:14px 0 18px}
@@ -59,6 +60,13 @@ header{display:flex;align-items:center;gap:10px;padding:8px 0 4px}
 }
 .btn:active{transform:translateY(1px)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
+.actions{display:flex;gap:10px;margin-top:12px}
+.btn2{
+  flex:1;min-height:46px;border-radius:var(--radius);border:1.5px solid var(--line);
+  background:#fff;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer;font-family:inherit;
+}
+.btn2.primary{background:var(--green);border-color:var(--green);color:#fff}
+.btn2:active{transform:translateY(1px)}
 
 /* ===== Output ===== */
 #out{margin-top:18px;display:none}
@@ -88,6 +96,17 @@ header{display:flex;align-items:center;gap:10px;padding:8px 0 4px}
 .total b{color:var(--orange)}
 .empty{text-align:center;color:var(--gray);font-size:14px;padding:34px 12px;background:var(--card);border:1px dashed var(--line);border-radius:var(--radius)}
 footer{margin-top:26px;text-align:center;font-size:11.5px;color:var(--gray)}
+
+/* ===== Modal ===== */
+.modal{position:fixed;inset:0;background:rgba(34,51,43,.55);display:none;align-items:center;justify-content:center;z-index:99;padding:20px}
+.modal.open{display:flex}
+.modal-box{background:#fff;border-radius:18px;max-width:340px;width:100%;padding:22px;text-align:center;position:relative}
+.modal-close{position:absolute;top:10px;right:12px;border:0;background:none;font-size:22px;color:var(--gray);cursor:pointer;line-height:1;padding:8px}
+.modal-box h3{font-size:18px;margin-bottom:6px}
+.modal-box p{font-size:13px;color:var(--gray);margin-bottom:14px}
+.modal-box img{width:72%;border-radius:12px;display:block;margin:0 auto 12px}
+.modal-box .tip{font-size:12px;color:var(--orange);font-weight:600}
+
 @media (min-width:768px){
   .wrap{max-width:760px}
   .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -101,6 +120,7 @@ footer{margin-top:26px;text-align:center;font-size:11.5px;color:var(--gray)}
 <header>
   <div class="logo"><svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#2F4A3E"/><path d="M16 7c-4 0-7 3-7 7 0 4 4 9 7 11 3-2 7-7 7-11 0-4-3-7-7-7zm-3 7a3 3 0 0 1 6 0c0 1.7-3 4-3 4s-3-2.3-3-4z" fill="#F6F7F3"/></svg></div>
   <div class="brand"><strong>搭菜大脑</strong><span>输入人数口味，输出一桌菜</span></div>
+  <button class="btn2" id="shareBtn" style="flex:0 0 auto;font-size:13px;padding:0 14px;min-height:40px">分享</button>
 </header>
 
 <div class="hero">
@@ -137,6 +157,10 @@ footer{margin-top:26px;text-align:center;font-size:11.5px;color:var(--gray)}
     </div>
   </div>
   <button class="btn" id="goBtn">生成一桌菜</button>
+  <div class="actions">
+    <button class="btn2 primary" id="supportBtn">解锁完整菜谱库</button>
+    <button class="btn2" id="demoBtn">再换一桌</button>
+  </div>
 </section>
 </div>
 
@@ -152,17 +176,24 @@ footer{margin-top:26px;text-align:center;font-size:11.5px;color:var(--gray)}
   <div id="viewBuy" style="display:none"></div>
 </div>
 
-<div class="empty" id="empty">还没生成。选好人数和口味，点「生成一桌菜」。<br>v0.1 demo · 数据库 13 道菜 · 规则 v0.2</div>
+<div class="empty" id="empty">还没生成。选好人数和口味，点「生成一桌菜」。<br>v0.2 · 数据库 13 道菜 · 规则 v0.2</div>
 
-<footer>搭菜大脑 v0.1 · 个人系统 · 2026-10-29</footer>
+<footer>搭菜大脑 v0.2 · 已被生成 <span id="genCount" style="color:var(--orange);font-weight:700">-</span> 次<br>访问 <span id="busuanzi_value_site_pv">-</span> · 访客 <span id="busuanzi_value_site_uv">-</span> · 2026-10-29</footer>
 </div>
 
+<div class="modal" id="payModal">
+  <div class="modal-box">
+    <button class="modal-close" id="payClose" aria-label="关闭">×</button>
+    <h3>解锁完整菜谱库</h3>
+    <p>现在能看到 13 道菜的搭配结果。扫码支持 ¥3，解锁全部菜谱详情 + 持续更新。</p>
+    <img src="qrcode.jpg" alt="微信收款码">
+    <p class="tip">扫码支付后，截图发给「阿鱼」即可解锁</p>
+  </div>
+</div>
+
+<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <script>
-/* ================= 菜谱数据库 v1 =================
-   字段: name 菜名 | cat 类(汤/糖水/主菜/凉菜) | meat 荤素
-   method 手法 | flavor 味型 | spicy 辣(0/1/2) | cost 人均成本
-   diff 难度 | memo 记忆点 | main 主料(采购用)
-   tags 适配: 健身/快手/聚餐/一人食/下饭 */
+/* ================= 菜谱数据库 v1 ================= */
 const DB = [
   {name:"奶香五红汤", cat:"糖水", meat:"素", method:"煮", flavor:"奶香甜糯", spicy:0, cost:4,  diff:"低", memo:"健身补气血、不上火", main:"红豆 红枣 花生 枸杞 黑米 糯米 牛奶", tags:["健身","快手"]},
   {name:"红糖鸡蛋姜汤", cat:"糖水", meat:"半荤", method:"煮", flavor:"甜姜暖", spicy:0, cost:3, diff:"低", memo:"经期暖身、早上喝", main:"鸡蛋 红糖 生姜", tags:["快手","一人食"]},
@@ -209,23 +240,18 @@ document.getElementById("budgetRange").oninput=function(e){
   document.getElementById("budgetNum").textContent=state.budget+" 元";
 };
 
-/* ================= 搭菜规则 v0.2 =================
-   选菜顺序: 汤/糖水 → 凉菜 → 主菜补齐
-   约束: 荤素配比、手法不重复、味型互补、预算内、辣度适配 */
+/* ================= 搭菜规则 v0.2 ================= */
 function pickMeal(){
   const n=state.people, need=Math.min(n+1,5), res=[];
   const per=Math.floor(state.budget/need);
   const spicyMax=state.taste==="能吃辣"?2:(state.taste==="清淡"?0:1);
   const noOil=state.avoid==="长痘控辣";
-
   function fit(d){
     if(noOil && d.method==="炸炒") return false;
     if(d.spicy>spicyMax) return false;
     if(noOil && d.spicy>1) return false;
     return true;
   }
-
-  /* 1. 汤/糖水 */
   let soup=DB.find(d=>d.name==="马蹄竹蔗茅根猪颈肉汤");
   if(state.avoid==="降火" && !fit(soup)) soup=null;
   if(!soup){
@@ -233,13 +259,9 @@ function pickMeal(){
     soup=pool.filter(fit).sort((a,b)=>a.cost-b.cost)[0]||pool[0];
   }
   res.push(soup);
-
-  /* 2. 凉菜 */
   const cold=DB.find(d=>d.cat==="凉菜");
   if(fit(cold)) res.push(cold);
   else res.push(DB.find(d=>d.name==="蒜蓉炒芦笋"));
-
-  /* 3. 主菜补齐 */
   const usedMethods={}, usedFlavor={};
   res.forEach(d=>{usedMethods[d.method]=1; usedFlavor[d.flavor]=1});
   let pool=DB.filter(d=>d.cat==="主菜" && !res.includes(d));
@@ -265,7 +287,6 @@ function pickMeal(){
   return res;
 }
 
-/* 时间线: 凉拌 → 煲/炖 → 焖 → 蒸 → 煎/炒 */
 const ORDER={"凉拌":0,"煲":1,"炖":1,"煮":2,"焖":3,"蒸":4,"煎":5,"炒":6,"炸炒":7};
 function timeline(dishes){
   const arr=dishes.slice().sort((a,b)=>ORDER[a.method]-ORDER[b.method]);
@@ -273,6 +294,16 @@ function timeline(dishes){
     const label=i===0?"先做":(i===arr.length-1?"最后做":"第"+(i+1)+"步");
     return {label:label, d:d};
   });
+}
+
+/* ================= 埋点 ================= */
+function hitCount(){
+  try{
+    fetch("https://api.countapi.xyz/hit/dacai-danao-v02/generate").then(function(r){return r.json()}).then(function(j){
+      const el=document.getElementById("genCount");
+      if(el && j.value) el.textContent=j.value;
+    }).catch(function(){});
+  }catch(e){}
 }
 
 /* ================= 渲染 ================= */
@@ -285,8 +316,6 @@ function render(){
   document.getElementById("summaryText").textContent=
     state.people+"人 · "+state.scene+" · "+state.taste+
     " · 预算"+state.budget+"元 → 推荐"+dishes.length+"道 · 约"+total+"元";
-
-  /* 一桌菜 */
   const vd=document.getElementById("viewDishes");
   vd.innerHTML="";
   dishes.forEach(function(d,i){
@@ -306,8 +335,6 @@ function render(){
       '<div class="note">'+d.memo+'</div></div>';
     vd.appendChild(el);
   });
-
-  /* 时间线 */
   const vt=document.getElementById("viewTimeline");
   vt.innerHTML="";
   timeline(dishes).forEach(function(t){
@@ -317,8 +344,6 @@ function render(){
       '<div><h4>'+t.d.name+'</h4><p>'+t.d.method+' · '+t.d.flavor+' · '+t.d.memo+'</p></div>';
     vt.appendChild(el);
   });
-
-  /* 采购 */
   const vb=document.getElementById("viewBuy");
   vb.innerHTML="";
   dishes.forEach(function(d){
@@ -330,10 +355,35 @@ function render(){
   const t=document.createElement("div");
   t.className="total"; t.innerHTML="合计约 <b>"+total+"</b> 元 · 人均 "+Math.round(total/state.people)+" 元";
   vb.appendChild(t);
+  hitCount();
 }
 
 /* ================= 事件 ================= */
 document.getElementById("goBtn").onclick=function(){render()};
+document.getElementById("demoBtn").onclick=function(){render()};
+document.getElementById("supportBtn").onclick=function(){
+  document.getElementById("payModal").classList.add("open");
+};
+document.getElementById("payClose").onclick=function(){
+  document.getElementById("payModal").classList.remove("open");
+};
+document.getElementById("payModal").onclick=function(e){
+  if(e.target===this) this.classList.remove("open");
+};
+document.getElementById("shareBtn").onclick=function(){
+  const url=location.href;
+  if(navigator.share){
+    navigator.share({title:"搭菜大脑", text:"输入人数口味，自动出一桌菜", url:url}).catch(function(){});
+  } else {
+    try{
+      navigator.clipboard.writeText(url).then(function(){
+        const b=document.getElementById("shareBtn");
+        b.textContent="已复制链接";
+        setTimeout(function(){b.textContent="分享"},1600);
+      }).catch(function(){});
+    }catch(e){}
+  }
+};
 document.querySelectorAll(".tab").forEach(function(tb){
   tb.onclick=function(){
     document.querySelectorAll(".tab").forEach(function(x){x.classList.remove("on")});
