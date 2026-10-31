@@ -129,6 +129,10 @@ footer{margin-top:26px;text-align:center;font-size:11.5px;color:var(--gray)}
 .modal-box img{width:72%;border-radius:12px;display:block;margin:0 auto 12px}
 .modal-box .tip{font-size:12px;color:var(--orange);font-weight:600}
 .modal-box .demo-link{margin-top:14px;font-size:13px;color:var(--green);font-weight:700;cursor:pointer;background:none;border:0;font-family:inherit}
+.admin-row{display:flex;gap:8px;margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
+.admin-row input{flex:1;min-height:44px;border:1.5px solid var(--line);border-radius:10px;padding:0 12px;font-size:16px;font-family:inherit;background:#fff}
+.admin-row input:focus{outline:none;border-color:var(--orange)}
+.admin-row button{min-height:44px;padding:0 14px;border:0;border-radius:10px;background:var(--orange);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
 
 @media (min-width:768px){
   .wrap{max-width:760px}
@@ -210,9 +214,9 @@ footer{margin-top:26px;text-align:center;font-size:11.5px;color:var(--gray)}
   <div id="viewBuy" style="display:none"></div>
 </div>
 
-<div class="empty" id="empty">还没生成。选好人数和口味，点「生成一桌菜」；或往下划自己点几道菜。<br>v0.6 · 数据库 <span id="dbCount">16</span> 道菜 · 带做法详情</div>
+<div class="empty" id="empty">还没生成。选好人数和口味，点「生成一桌菜」；或往下划自己点几道菜。<br>v0.7 · 数据库 <span id="dbCount">16</span> 道菜 · 带做法详情</div>
 
-<footer>搭菜大脑 v0.6 · 菜谱 <span id="dbCount2" style="color:var(--orange);font-weight:700">16</span> 道 · 本机已规划 <span id="genCount" style="color:var(--orange);font-weight:700">0</span> 桌<br>全网访问 <span id="busuanzi_value_site_pv">-</span> · 访客 <span id="busuanzi_value_site_uv">-</span> · 2026-10-29</footer>
+<footer>搭菜大脑 v0.7 · 菜谱 <span id="dbCount2" style="color:var(--orange);font-weight:700">16</span> 道 · 本机已规划 <span id="genCount" style="color:var(--orange);font-weight:700">0</span> 桌<br>全网访问 <span id="busuanzi_value_site_pv">-</span> · 访客 <span id="busuanzi_value_site_uv">-</span> · 2026-10-31</footer>
 </div>
 
 <div class="modal" id="payModal">
@@ -223,6 +227,10 @@ footer{margin-top:26px;text-align:center;font-size:11.5px;color:var(--gray)}
     <img src="qrcode.jpg" alt="微信收款码">
     <p class="tip">扫码支付后，截图发给「阿鱼」即可解锁</p>
     <button class="demo-link" id="demoUnlock">先免费体验全部步骤（演示模式）</button>
+    <div class="admin-row">
+      <input id="adminPass" placeholder="管理员暗号" autocomplete="off">
+      <button class="admin-btn" id="adminUnlock">解锁</button>
+    </div>
   </div>
 </div>
 
@@ -317,6 +325,8 @@ const DB = [
 /* ================= 状态 ================= */
 const state = {people:4, scene:"聚餐", taste:"能吃辣", avoid:"无", budget:150, selected:[]};
 let unlocked = false;
+const ADMIN_PASS = "ayu2026";
+try{ if(localStorage.getItem("dacai-admin")==="1") unlocked=true; }catch(e){}
 const PEOPLE=[1,2,3,4,5], SCENES=[["聚餐","日常","健身","一人食"]];
 const TASTE=[["能吃辣","清淡","都行"]], AVOID=[["无","长痘控辣","降火"]];
 
@@ -580,6 +590,19 @@ document.getElementById("demoUnlock").onclick=function(){
   unlocked=true;
   document.getElementById("payModal").classList.remove("open");
   render();
+};
+document.getElementById("adminUnlock").onclick=function(){
+  const v=document.getElementById("adminPass").value.trim();
+  if(v===ADMIN_PASS){
+    unlocked=true;
+    try{localStorage.setItem("dacai-admin","1")}catch(e){}
+    document.getElementById("payModal").classList.remove("open");
+    document.getElementById("adminPass").value="";
+    render();
+  }else{
+    document.getElementById("adminPass").value="";
+    document.getElementById("adminPass").placeholder="暗号不对，再试";
+  }
 };
 document.getElementById("shareBtn").onclick=function(){
   const url=location.href;
