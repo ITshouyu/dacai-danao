@@ -133,6 +133,18 @@ footer{margin-top:26px;text-align:center;font-size:11.5px;color:var(--gray)}
 .admin-row input{flex:1;min-height:44px;border:1.5px solid var(--line);border-radius:10px;padding:0 12px;font-size:16px;font-family:inherit;background:#fff}
 .admin-row input:focus{outline:none;border-color:var(--orange)}
 .admin-row button{min-height:44px;padding:0 14px;border:0;border-radius:10px;background:var(--orange);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+/* ===== v0.8 双版本：小白/进阶 + 可视化 ===== */
+.mode-switch{display:flex;gap:6px;margin-bottom:12px}
+.mode-switch button{flex:1;min-height:38px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--gray);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer}
+.mode-switch button.on{border-color:var(--orange);color:var(--orange);background:rgba(217,72,15,.06)}
+.spirit{background:linear-gradient(135deg,rgba(217,72,15,.10),rgba(217,72,15,.03));border-left:3px solid var(--orange);border-radius:8px;padding:8px 10px;font-size:13px;font-weight:700;margin-bottom:10px;line-height:1.5;color:var(--ink)}
+.sauce{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 10px}
+.sauce span{background:#fff8ef;border:1px solid #f2c48d;color:#8a4d00;border-radius:999px;padding:3px 9px;font-size:11px}
+.pit{background:#fff3f3;border:1px solid #f3c1c1;border-radius:8px;padding:7px 10px;font-size:12px;color:#a63c3c;margin-bottom:10px;line-height:1.5}
+.pro-fire{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.pro-fire span{background:#f4f6f2;border:1px solid var(--line);border-radius:8px;padding:5px 9px;font-size:12px;color:var(--ink)}
+.pro-fire b{color:var(--orange)}
+.pro-extra{background:#f0f8f3;border:1px solid #bfe3d2;border-radius:8px;padding:8px 10px;font-size:12px;color:#1d6b46;margin-bottom:10px;line-height:1.6}
 
 @media (min-width:768px){
   .wrap{max-width:760px}
@@ -214,9 +226,9 @@ footer{margin-top:26px;text-align:center;font-size:11.5px;color:var(--gray)}
   <div id="viewBuy" style="display:none"></div>
 </div>
 
-<div class="empty" id="empty">还没生成。选好人数和口味，点「生成一桌菜」；或往下划自己点几道菜。<br>v0.7 · 数据库 <span id="dbCount">16</span> 道菜 · 带做法详情</div>
+<div class="empty" id="empty">还没生成。选好人数和口味，点「生成一桌菜」；或往下划自己点几道菜。<br>v0.8 · 数据库 <span id="dbCount">16</span> 道菜 · 小白/进阶双版本做法</div>
 
-<footer>搭菜大脑 v0.7 · 菜谱 <span id="dbCount2" style="color:var(--orange);font-weight:700">16</span> 道 · 本机已规划 <span id="genCount" style="color:var(--orange);font-weight:700">0</span> 桌<br>全网访问 <span id="busuanzi_value_site_pv">-</span> · 访客 <span id="busuanzi_value_site_uv">-</span> · 2026-10-31</footer>
+<footer>搭菜大脑 v0.8 · 菜谱 <span id="dbCount2" style="color:var(--orange);font-weight:700">16</span> 道 · 本机已规划 <span id="genCount" style="color:var(--orange);font-weight:700">0</span> 桌<br>全网访问 <span id="busuanzi_value_site_pv">-</span> · 访客 <span id="busuanzi_value_site_uv">-</span> · 2026-11-02</footer>
 </div>
 
 <div class="modal" id="payModal">
@@ -253,6 +265,8 @@ const DB = [
    prepMin:8, cookMin:90, pot:"锅1", prep:"猪颈肉冷水下锅焯水；竹蔗破成条（不破不出味）",
    steps:["猪颈肉冷水下锅焯水，冲净沥干","竹蔗破条、马蹄对半切、胡萝卜切块","全部下锅加足量水，大火煮开转小火煲 1–1.5 小时","基本不放盐，竹蔗自甜；肉捞出切块蘸豉油/沙姜，一汤两用"],
    key:"竹蔗选青皮甘蔗；猪颈肉先焯水去腥；放凉冰镇或热饮都行",
+   simple:{spirit:"竹蔗马蹄自带清甜，猪颈肉提肉香，一煲=汤+肉菜",steps:["猪颈肉冷水下锅焯水冲净（去腥的关键）","竹蔗破条、马蹄对半切、胡萝卜切块，全下锅加水，大火煮开","转小火煲 1–1.5 小时，基本不放盐，肉捞出蘸豉油吃"],pit:"竹蔗必须破条才出味；全程小火慢煲，甜味才出得来"},
+   pro:"火候：大火煮开转小火，水面微沸不翻滚；煲 1–1.5 小时越久越醇，1 小时后可把肉捞出切块防柴；盐最后放或基本不放——竹蔗自甜；想更鲜加 2 粒蜜枣。放凉冰镇或热饮都行。",
    ings:[{n:"猪颈肉",q:100,u:"g",g:"meat"},{n:"青皮竹蔗",q:0.5,u:"节",g:"soup"},{n:"马蹄",q:2,u:"个",g:"veg"},{n:"茅根",q:1,u:"小把",g:"soup"},{n:"胡萝卜",q:0.3,u:"根",g:"veg"},{n:"生姜",q:1,u:"片",g:"cond"}]},
   {name:"清蒸鲈鱼", cat:"主菜", meat:"荤", method:"蒸", flavor:"清鲜嫩", spicy:0, cost:15, diff:"中", memo:"高蛋白低脂、摆盘好看", tags:["健身","聚餐"],
    prepMin:10, cookMin:7, pot:"蒸层", prep:"葱姜盐搓出汁兑水泡鱼 5–10 分钟去腥",
@@ -283,6 +297,8 @@ const DB = [
    prepMin:15, cookMin:8, pot:"锅1", prep:"虾开背去虾线，洗净彻底沥干，拍薄薄一层干淀粉",
    steps:["油烧到六成热，虾下锅煎到外壳金黄酥脆，盛出","锅留底油，倒避风塘炒料，小火炒香（别炒糊）","虾回锅，加干辣椒、葱花，大火翻匀让蒜酥裹满虾","出锅"],
    key:"虾要沥干+拍粉才脆；炒料本身够咸全程不放盐；炒料必须小火，蒜酥一糊发苦；虾壳脆就停，久煎肉柴",
+   simple:{spirit:"蒜酥裹虾、壳脆肉嫩，调料包+看火两件事就能成",steps:["虾开背去虾线，彻底沥干拍薄淀粉；油六成热下虾，煎到壳金黄酥脆盛出","锅留底油，倒避风塘炒料，小火炒香（一糊就苦）","虾回锅加干辣椒、葱花，大火翻匀让蒜酥裹满，出锅"],pit:"全程不放盐（炒料够咸）；蒜酥必须小火，焦糊是这道菜唯一的翻车点"},
+   pro:"火候：油六成热（丢一粒蒜末冒泡不溅）下虾，中大火快煎 1–2 分钟壳变脆即停，久煎肉柴；炒料全程小火，蒜酥微黄就下虾；回锅大火翻匀 30 秒内出锅。双锅流：蒸菜占蒸层时，虾用锅 1 最后做，最显手艺。",
    ings:[{n:"大虾",q:150,u:"g",g:"meat"},{n:"避风塘炒料",q:0.25,u:"包",g:"cond"},{n:"干辣椒",q:2,u:"个",g:"veg"},{n:"小葱",q:2,u:"根",g:"veg"},{n:"玉米淀粉",q:1,u:"勺",g:"cond"}]},
   {name:"香煎鸡腿排", cat:"主菜", meat:"荤", method:"煎", flavor:"焦香嫩", spicy:0, cost:8, diff:"低", memo:"高蛋白、无油皮朝下煎", tags:["健身","快手","一人食"],
    prepMin:15, cookMin:10, pot:"锅2", prep:"提前冷藏解冻；刀背拍松，肉面划两刀防收缩；腌 15–20 分钟",
@@ -293,16 +309,22 @@ const DB = [
    prepMin:10, cookMin:20, pot:"锅1", prep:"鸡斩块，冷水下锅焯水，冲净沥干",
    steps:["锅下香油（这道用香油起锅是香味的根），姜片蒜瓣小火爆香","下鸡块，中火煸到表面微黄","倒米酒、生抽、老抽、糖、干辣椒，翻炒上色","小火盖盖焖 15 分钟","开盖大火收汁，收到油亮起泡，最后再淋半勺香油出锅"],
    key:"香油起锅+收汁再淋香油；米酒别用料酒替代；焖够 15 分钟才入味不柴；留一点汁拌饭",
+   simple:{spirit:"一杯酒一杯酱油一杯香油，焖出油亮酱色，汁是精华",steps:["香油起锅，姜片蒜瓣小火爆香，下鸡块中火煸到表面微黄","倒米酒、生抽、老抽、糖、干辣椒，翻炒上色，小火盖盖焖 15 分钟","开盖大火收汁到油亮起泡，最后淋半勺香油出锅"],pit:"米酒别换料酒；焖够 15 分钟才嫩；收汁留一点拌饭"},
+   pro:"火候：香油全程小火防焦苦；煸鸡中火逼出鸡油；焖 15 分钟全程小火，中途别揭盖；收汁大火盯着，起大泡油亮即关火，最后淋香油提亮。鸡腿或半只鸡都行，斩小块更易熟入味。",
    ings:[{n:"鸡腿/半只鸡",q:175,u:"g",g:"meat"},{n:"米酒",q:80,u:"ml",g:"cond"},{n:"生抽",q:3,u:"勺",g:"cond"},{n:"老抽",q:1,u:"勺",g:"cond"},{n:"香油",q:50,u:"ml",g:"cond"},{n:"白糖",q:1,u:"勺",g:"cond"},{n:"生姜",q:5,u:"片",g:"cond"},{n:"大蒜",q:6,u:"瓣",g:"cond"},{n:"干辣椒",q:3,u:"个",g:"veg"}]},
   {name:"番茄炖牛肋条", cat:"主菜", meat:"荤", method:"炖", flavor:"酸甜软烂", spicy:0, cost:18, diff:"中", memo:"出品像西餐厅、提前炖、汤汁拌饭", tags:["聚餐"],
    prepMin:15, cookMin:90, pot:"锅1", prep:"牛肋条切块冷水焯水；番茄开水烫一下去皮切块",
    steps:["姜蒜爆香，下番茄炒到出沙","下牛肋条，加番茄酱、生抽、糖炒匀，加水没过","小火炖 1–1.5 小时至软烂","最后加盐、开盖收汁（别收太干，留汁拌饭）"],
    key:"牛肋条选带筋膜肥瘦相间的炖久不柴；番茄先炒出沙汤汁才浓；可提前炖好保温，上桌前收汁",
+   simple:{spirit:"番茄炒出沙+牛肋条久炖，酸甜软烂，汤汁拌饭是灵魂",steps:["姜蒜爆香，下番茄中火炒到出沙；下焯过水的牛肋条，加番茄酱、生抽、糖炒匀","加水没过，小火炖 1–1.5 小时至软烂","最后加盐、开盖收汁，别收太干留汁拌饭"],pit:"番茄先炒出沙汤汁才浓；选带筋膜牛肋条炖久不柴；汁是精华别收干"},
+   pro:"火候：番茄中火炒 2–3 分钟出沙再下肉；炖 1–1.5 小时全程小火，水面微沸；想快用高压锅 30 分钟；可提前炖好保温，上桌前大火收汁 5 分钟，汁浓亮即停。拌饭记得饭煮软一点。",
    ings:[{n:"牛肋条",q:150,u:"g",g:"meat"},{n:"番茄",q:1,u:"个",g:"veg"},{n:"番茄酱",q:2,u:"勺",g:"cond"},{n:"生抽",q:2,u:"勺",g:"cond"},{n:"白糖",q:1,u:"勺",g:"cond"},{n:"生姜",q:3,u:"片",g:"cond"},{n:"大蒜",q:3,u:"瓣",g:"cond"}]},
   {name:"擂辣椒皮蛋", cat:"凉菜", meat:"半荤", method:"凉拌", flavor:"酸辣香", spicy:2, cost:6, diff:"低", memo:"擂钵上桌、仪式感是这道菜的一半",
    prepMin:8, cookMin:5, pot:"锅2", prep:"干锅烧热不放油，辣椒整根放进去压着煎到两面焦黑起虎皮，撕去焦皮",
    steps:["皮蛋剥壳切块","蒜末+生抽+香醋+糖+香油先擂出香味","加煎好的辣椒擂碎","最后放皮蛋再轻擂几下，留点块状口感，连擂钵端上桌"],
    key:"辣椒干锅煎出虎皮才香；辣度靠辣椒品种，怕辣换菜椒；皮蛋最后放擂成碎中带块",
+   simple:{spirit:"辣椒煎出虎皮再擂，皮蛋留块，擂钵上桌仪式感拉满",steps:["干锅烧热不放油，整根辣椒压着煎到两面焦黑起虎皮，撕去焦皮","蒜末+生抽+香醋+糖+香油先擂出香味，加煎好的辣椒擂碎","最后放皮蛋轻擂几下留块状口感，连擂钵端上桌"],pit:"辣椒必须煎出虎皮才香；皮蛋最后放，擂成碎中带块"},
+   pro:"火候：全程不放油干锅煎，中火压煎到辣椒软塌、两面起黑斑即可，别煎成全黑炭化；辣度靠品种（螺丝椒辣、菜椒不辣）；皮蛋别擂太碎，留角块口感最好；擂好放 10 分钟入味再上桌更香。",
    ings:[{n:"皮蛋",q:1,u:"个",g:"meat"},{n:"螺丝椒",q:1,u:"根",g:"veg"},{n:"大蒜",q:4,u:"瓣",g:"cond"},{n:"生抽",q:2,u:"勺",g:"cond"},{n:"香醋",q:1,u:"勺",g:"cond"},{n:"香油",q:1,u:"勺",g:"cond"},{n:"白糖",q:0.5,u:"勺",g:"cond"}]},
   {name:"白灼基围虾", cat:"主菜", meat:"荤", method:"煮", flavor:"鲜甜弹", spicy:0, cost:12, diff:"低", memo:"高蛋白、蘸汁就鲜、宴客也拿得出手", tags:["健身","快手"],
    prepMin:8, cookMin:4, pot:"锅1", prep:"虾剪须开背去虾线，冲净沥干",
@@ -477,13 +499,37 @@ function bumpCount(){
 }
 
 /* ================= 渲染 ================= */
+/* ===== v0.8 双版本：小白版（一眼版） / 进阶版（火候细节） ===== */
+function autoSimple(d){
+  var st=d.steps, three=st.length<=3?st:[st[0],st[Math.floor((st.length-1)/2)],st[st.length-1]];
+  var conds=(d.ings||[]).filter(function(x){return x.g==="cond"}).map(function(x){return (x.q+''+x.u)+' '+x.n});
+  return {spirit:d.memo, steps:three, pit:d.key, sauce:conds};
+}
+function simpleView(d){
+  var s=d.simple||autoSimple(d);
+  var h='<div class="spirit">'+s.spirit+'</div>';
+  s.steps.forEach(function(t,si){h+='<div class="step-item"><span class="sn">'+(si+1)+'</span>'+t+'</div>'});
+  if(s.pit) h+='<div class="pit">注意：'+s.pit+'</div>';
+  if(s.sauce&&s.sauce.length) h+='<div class="sauce">'+s.sauce.map(function(x){return '<span>'+x+'</span>'}).join('')+'</div>';
+  return h;
+}
+function proView(d){
+  var h='<div class="pro-fire"><span>锅位 <b>'+d.pot+'</b></span><span>备菜 <b>'+d.prepMin+'</b> min</span><span>烹饪 <b>'+d.cookMin+'</b> min</span></div>';
+  h+='<div class="sd">备菜</div><div class="step-item" style="border-bottom:0"><span class="sn">备</span>'+d.prep+'</div>';
+  h+='<div class="sd">做法</div>'+d.steps.map(function(s,si){return '<div class="step-item"><span class="sn">'+(si+1)+'</span>'+s+'</div>'}).join('');
+  if(d.pro) h+='<div class="sd">火候与细节</div><div class="pro-extra">'+d.pro+'</div>';
+  h+='<div class="sd">关键</div><div class="step-item" style="border-bottom:0"><span class="sn" style="font-size:10px">要</span>'+d.key+'</div>';
+  return h;
+}
 function dishCard(d,i){
   const hot=d.spicy>0;
-  const detail=unlocked
-    ? d.steps.map(function(s,si){return '<div class="step-item"><span class="sn">'+(si+1)+'</span>'+s+'</div>'}).join("")
-      +'<div class="sd">关键</div><div class="step-item" style="border-bottom:0"><span class="sn" style="font-size:10px">要</span>'+d.key+'</div>'
-    : '<div class="step-item"><span class="sn">1</span>'+d.steps[0]+'</div>'
-      +'<div class="locked-hint">还有 '+Math.max(0,d.steps.length-1)+' 步做法已锁定 · <b>解锁完整菜谱库</b>（¥3）</div>';
+  const body=unlocked
+    ? '<div class="mode-switch"><button data-v="s" class="on">小白版</button><button data-v="p">进阶版</button></div>'
+      +'<div class="view-s">'+simpleView(d)+'</div>'
+      +'<div class="view-p" style="display:none">'+proView(d)+'</div>'
+    : '<div class="spirit">'+(d.simple?d.simple.spirit:d.memo)+'</div>'
+      +'<div class="step-item"><span class="sn">1</span>'+d.steps[0]+'</div>'
+      +'<div class="locked-hint">还有 '+Math.max(0,d.steps.length-1)+' 步做法 + 火候细节已锁定 · <b>解锁完整菜谱库</b>（¥3）</div>';
   return '<div class="dish'+(unlocked?' open':'')+'">'
     +'<div class="dish-head">'
     +'<div class="idx">'+(i+1)+'</div>'
@@ -497,9 +543,22 @@ function dishCard(d,i){
     +'<div style="color:var(--gray);font-size:11px;flex:none;padding-top:6px">'+(unlocked?'收起 ▲':'展开 ▼')+'</div>'
     +'</div>'
     +'<div class="dish-detail"><div class="sd">备菜</div><div class="step-item" style="border-bottom:0"><span class="sn">备</span>'+d.prep+'</div>'
-    +'<div class="sd">做法</div>'+detail
+    +'<div class="sd">做法</div>'+body
     +'</div></div>';
 }
+document.addEventListener("click",function(e){
+  var b=e.target;
+  if(b.tagName==="BUTTON"&&b.getAttribute("data-v")){
+    var card=b.closest(".dish");
+    if(!card) return;
+    card.querySelectorAll(".mode-switch button").forEach(function(x){x.classList.remove("on")});
+    b.classList.add("on");
+    var s=card.querySelector(".view-s"), p=card.querySelector(".view-p");
+    if(!s||!p) return;
+    if(b.getAttribute("data-v")==="s"){s.style.display="";p.style.display="none"}
+    else{s.style.display="none";p.style.display=""}
+  }
+});
 function renderPlan(dishes, mode){
   const total=shoppingTotal(dishes);
   document.getElementById("out").style.display="block";
